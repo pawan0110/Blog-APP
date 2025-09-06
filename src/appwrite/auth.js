@@ -35,13 +35,13 @@ export class AuthService {
     }
 
     // Get logged-in user
-    async getUser() {
+    async getCurrentUser() {
         try {
             return await this.account.get();
         } catch (error) {
             console.log("Appwrite service :: getUser :: error", error);
-            throw error;
         }
+        return null;
     }
 
     // Logout
@@ -50,7 +50,6 @@ export class AuthService {
             return await this.account.deleteSessions();
         } catch (error) {
             console.log("Appwrite service :: logout :: error", error);
-            throw error;
         }
     }
 }
