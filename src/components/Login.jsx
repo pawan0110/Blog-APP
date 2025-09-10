@@ -73,7 +73,7 @@ return (
               required: true,
             })}
           />
-          <Button type="submit" className="w-full">
+          <Button Button type="submit" className="w-full">
             Sign in
           </Button>
         </div>
