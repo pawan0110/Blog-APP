@@ -7,7 +7,6 @@ import { Outlet } from "react-router-dom";
 import Footer from "./components/Footer/Footer";
 import authService from "./appwrite/auth";
 
-
 function App() {
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
@@ -26,14 +25,17 @@ function App() {
   }, []);
 
   return !loading ? (
-    <div className="min-h-screen flex flex-wrap content-between bg-gray-400">
-      <div className="w-full block">
-        <Header />
-        <main>
-          TODO: <Outlet />
-        </main>
-        <Footer />
-      </div>
+    <div className="flex flex-col min-h-screen bg-gray-400">
+      {/* Header at top */}
+      <Header />
+
+      {/* Main content grows to fill space */}
+      <main className="flex-grow w-full p-4">
+        <Outlet />
+      </main>
+
+      {/* Footer always at bottom */}
+      <Footer />
     </div>
   ) : null;
 }
