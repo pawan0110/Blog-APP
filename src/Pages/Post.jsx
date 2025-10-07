@@ -27,7 +27,8 @@ export default function Post() {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
 
     try {
-      const deleted = await appwriteService.deletePost(post.$id);
+      const deleted = await appwriteService.deletePost(post.$id || post.slug);
+
       if (deleted && post.featuredImage) {
         await appwriteService.deleteFile(post.featuredImage);
       }

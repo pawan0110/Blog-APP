@@ -1,16 +1,20 @@
 import React from "react";
 
 export default function Button({
-    children,
-    type= "button",
-    bgcolor = "bg-blue-600",
-    textColor = "text-white",
-    className = "",
-    ...props
+  children,
+  type = "button",
+  bgcolor = "bg-blue-600",
+  textColor = "text-white",
+  className = "",
+  ...props
 }) {
-    return (
-      <button className={`px-4 py-2 rounded-lg ${bgcolor} ${textColor} ${className}`}>
-        {children}
-      </button>
-    );
+  return (
+    <button
+      type={type}
+      className={`px-4 py-2 rounded-lg ${bgcolor} ${textColor} ${className}`}
+      {...props}   // ✅ Pass props like onClick, disabled, etc.
+    >
+      {children}
+    </button>
+  );
 }

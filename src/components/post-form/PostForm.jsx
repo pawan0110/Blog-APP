@@ -1,12 +1,21 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, Input, RTE, Select } from "..";
 import appwriteService from "../../appwrite/config";
+import authService from "../../appwrite/auth";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export default function PostForm({ post }) {
-  const { register, handleSubmit, watch, setValue, getValues, control } = useForm({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    getValues,
+    control,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       title: post?.title || "",
       slug: post?.$id || "",
@@ -16,9 +25,25 @@ export default function PostForm({ post }) {
   });
 
   const navigate = useNavigate();
-  const userData = useSelector((state) => state.auth.userData);
+  const reduxUser = useSelector((state) => state.auth.userData);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // Slug transform
+  // ✅ Load user if Redux is empty
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (!reduxUser) {
+        const user = await authService.getCurrentUser();
+        setCurrentUser(user);
+      } else {
+        setCurrentUser(reduxUser);
+      }
+    };
+    fetchUser();
+  }, [reduxUser]);
+
+  // ✅ Slug generator
   const slugTransform = useCallback((value) => {
     if (!value) return "";
     return value
@@ -28,8 +53,8 @@ export default function PostForm({ post }) {
       .replace(/\s+/g, "-");
   }, []);
 
-  // Watch title to update slug
-  React.useEffect(() => {
+  // ✅ Auto-update slug when title changes
+  useEffect(() => {
     const subscription = watch((value, { name }) => {
       if (name === "title") {
         setValue("slug", slugTransform(value.title), { shouldValidate: true });
@@ -38,15 +63,23 @@ export default function PostForm({ post }) {
     return () => subscription.unsubscribe();
   }, [watch, slugTransform, setValue]);
 
+  // ✅ Submit handler
   const submit = async (data) => {
+    setLoading(true);
+    setError("");
+
     try {
+      if (!currentUser) {
+        setError("User not logged in.");
+        return;
+      }
+
       let fileId = post?.featuredImage;
 
       // Upload new image if selected
       if (data.image && data.image[0]) {
         const file = await appwriteService.uploadFile(data.image[0]);
         if (file) {
-          // Delete old image if exists
           if (post?.featuredImage) {
             await appwriteService.deleteFile(post.featuredImage);
           }
@@ -70,35 +103,55 @@ export default function PostForm({ post }) {
           slug: data.slug,
           content: data.content,
           status: data.status,
-          userId: userData.$id,
+          userId: currentUser.$id,
           featuredImage: fileId,
         });
         if (created) navigate(`/post/${created.$id}`);
       }
     } catch (err) {
       console.error("Post submit error:", err);
+      setError("Something went wrong while saving your post.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
+      {/* Left Section */}
       <div className="w-2/3 px-2">
         <Input
           label="Title"
           placeholder="Enter title"
           className="mb-4"
-          {...register("title", { required: true })}
+          {...register("title", { required: "Title is required" })}
         />
+        {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
+
         <Input
           label="Slug"
           placeholder="Slug"
           className="mb-4"
-          {...register("slug", { required: true })}
+          {...register("slug", {
+            required: "Slug is required",
+            pattern: {
+              value: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+              message: "Slug must contain lowercase letters, numbers, or hyphens only",
+            },
+          })}
           onInput={(e) => setValue("slug", slugTransform(e.target.value))}
         />
-        <RTE label="Content" name="content" control={control} defaultValue={getValues("content")} />
+        {errors.slug && <p className="text-red-500 text-sm">{errors.slug.message}</p>}
+
+        <RTE
+          label="Content"
+          name="content"
+          control={control}
+          defaultValue={getValues("content")}
+        />
       </div>
 
+      {/* Right Section */}
       <div className="w-1/3 px-2">
         <Input
           label="Featured Image"
@@ -107,8 +160,6 @@ export default function PostForm({ post }) {
           accept="image/png, image/jpg, image/jpeg, image/gif"
           {...register("image", { required: !post })}
         />
-
-        {/* Show existing image */}
         {post?.featuredImage && (
           <div className="w-full mb-4">
             <img
@@ -123,11 +174,22 @@ export default function PostForm({ post }) {
           options={["active", "inactive"]}
           label="Status"
           className="mb-4"
-          {...register("status", { required: true })}
+          {...register("status", { required: "Status is required" })}
         />
 
-        <Button type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full">
-          {post ? "Update Post" : "Create Post"}
+        {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+
+        <Button
+          type="submit"
+          disabled={loading}
+          bgColor={post ? "bg-green-500" : undefined}
+          className="w-full"
+        >
+          {loading
+            ? "Saving..."
+            : post
+            ? "Update Post"
+            : "Create Post"}
         </Button>
       </div>
     </form>
