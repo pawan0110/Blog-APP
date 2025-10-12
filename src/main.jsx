@@ -1,30 +1,31 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
-import './index.css'
-import { Provider } from 'react-redux'
-import store from './store/store.js'
-import { RouterProvider, createBrowserRouter } from 'react-router-dom'
-import Home from './pages/Home.jsx'
-import { AuthLayout, Login } from './components/index.js'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx";
+import "./index.css";
+import { Provider } from "react-redux";
+import store from "./store/store.js";
+import {
+  RouterProvider,
+  createBrowserRouter,
+} from "react-router-dom";
 
+import Home from "./pages/Home.jsx";
+import AddPost from "./pages/AddPost.jsx";
+import Signup from "./pages/Signup.jsx";
+import EditPost from "./pages/EditPost.jsx";
+import Profile from "./pages/Profile.jsx"; // ✅ fixed incorrect "Pages" folder casing
+import Post from "./pages/Post.jsx";
+import AllPosts from "./pages/AllPosts.jsx";
+import { AuthLayout, Login } from "./components/index.js";
 
-import AddPost from "./pages/AddPost";
-import Signup from './pages/Signup'
-import EditPost from "./pages/EditPost";
-import Profile from "./Pages/Profile.jsx";
-
-
-import Post from "./pages/Post";
-
-import AllPosts from "./pages/AllPosts";
-
+// ✅ Define all routes
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
       { path: "/", element: <Home /> },
+
       {
         path: "/login",
         element: (
@@ -65,9 +66,10 @@ const router = createBrowserRouter([
           </AuthLayout>
         ),
       },
-      { path: "/post/:slug", element: <Post /> },
-
-      // ✅ Add this new route
+      {
+        path: "/post/:slug",
+        element: <Post />,
+      },
       {
         path: "/profile",
         element: (
@@ -80,11 +82,11 @@ const router = createBrowserRouter([
   },
 ]);
 
-
-ReactDOM.createRoot(document.getElementById('root')).render(
+// ✅ Render App
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
-    <RouterProvider router={router}/>
+      <RouterProvider router={router} />
     </Provider>
-  </React.StrictMode>,
-)
+  </React.StrictMode>
+);
