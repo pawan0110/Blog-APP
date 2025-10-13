@@ -9,13 +9,13 @@ import {
   createBrowserRouter,
 } from "react-router-dom";
 
-import Home from "./folder/Home.jsx";
-import AddPost from "./folder/AddPost.jsx";
-import Signup from "./folder/Signup.jsx";
-import EditPost from "./folder/EditPost.js";
-import Profile from "./folder/Profile.js"; // ✅ fixed incorrect "Pages" folder casing
-import Post from "./folder/Post.js";
-import AllPosts from "./folder/AllPosts.js";
+import Home from "./pages/Home.js";
+import AddPost from "./pages/AddPost.jsx";
+import Signup from "./pages/Signup.jsx";
+import EditPost from "./pages/EditPost.js";
+import Profile from "./pages/Profile.js"; // ✅ fixed incorrect "Pages" folder casing
+import Post from "./pages/Post.js";
+import AllPosts from "./pages/AllPosts.js";
 import { AuthLayout, Login } from "./components/index.js";
 
 // ✅ Define all routes
