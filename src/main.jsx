@@ -9,7 +9,7 @@ import {
   createBrowserRouter,
 } from "react-router-dom";
 
-import Home from "./pages/Home.jsx";
+import Home from "./Pages/Home.jsx";
 import AddPost from "./pages/AddPost.jsx";
 import Signup from "./pages/Signup.jsx";
 import EditPost from "./pages/EditPost.jsx";
