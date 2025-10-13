@@ -24,3 +24,7 @@ dist-ssr/
 
 # Others
 *.swp
+
+node_modules
+.env
+dist
